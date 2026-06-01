@@ -5,6 +5,7 @@
 # Versión: 2.0 | Mayo 2026
 # ============================================================
 
+from base_datos import crear_tabla, guardar_cotizacion
 
 # --- SECCIÓN 1: PLATAFORMAS DE PAGO ---
 PLATAFORMAS = {
@@ -111,6 +112,12 @@ def mostrar_resultado(puntadas, tarifa, complejidad, prenda, plataforma, modo):
     print(f"  (Incluye comisión de {plataforma})")
     print("=" * 48)
 
+# Guardamos la cotizacion en el historial
+    guardar_cotizacion(puntadas, tarifa, complejidad, prenda, plataforma, modo, precio)
+
+
+# Inicializamos la base de datos
+crear_tabla()
 
 # --- SECCIÓN 7: PRUEBAS ---
 
