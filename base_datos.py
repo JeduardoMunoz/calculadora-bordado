@@ -63,19 +63,32 @@ def guardar_cotizacion(puntadas, tarifa, complejidad, prenda, plataforma, modo, 
     print(f"  [Cotizacion guardada en historial]")
 
 
-def ver_historial():
+def obtener_historial(limite=20):
+    # REFACTOR v1.1 — función extraída de ver_historial()
+    # Motivo: ver_historial() mezclaba dos responsabilidades:
+    #   1. obtener datos de la base de datos
+    #   2. imprimir en consola
+    # Al separar la consulta SQL en su propia función,
+    # servidor.py puede obtener los datos sin duplicar el SQL.
+    # Principio aplicado: DRY (Don't Repeat Yourself)
     conexion = sqlite3.connect(DB_NOMBRE)
     cursor = conexion.cursor()
-
-    # Traemos todas las cotizaciones ordenadas por fecha
     cursor.execute("""
         SELECT id, fecha, puntadas, complejidad, prenda, modo, precio_final
         FROM cotizaciones
         ORDER BY fecha DESC
-    """)
-
+        LIMIT ?
+    """, (limite,))
     filas = cursor.fetchall()
     conexion.close()
+    return filas  # devuelve datos, no imprime
+
+
+def ver_historial():
+    # REFACTOR v1.1 — ahora delega la consulta a obtener_historial()
+    # Antes: tenía su propia conexión y consulta SQL
+    # Ahora: solo se encarga de imprimir — un solo trabajo
+    filas = obtener_historial()
 
     if not filas:
         print("\nNo hay cotizaciones guardadas todavia.")
