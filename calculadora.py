@@ -124,7 +124,9 @@ crear_tabla()
 # Mismo diseño exacto, tres modos distintos
 # Así vemos SOLO el impacto del modo de precio
 
-print("\n--- COMPARACION DE MODOS ---")
-mostrar_resultado(8000, 2.50, "medio", "tela_plana", "paypal", "captacion")
-mostrar_resultado(8000, 2.50, "medio", "tela_plana", "paypal", "estandar")
-mostrar_resultado(8000, 2.50, "medio", "tela_plana", "paypal", "premium")
+if __name__ == "__main__":
+    crear_tabla()
+    print("\n--- COMPARACION DE MODOS ---")
+    mostrar_resultado(8000, 2.50, "medio", "tela_plana", "paypal", "captacion")
+    mostrar_resultado(8000, 2.50, "medio", "tela_plana", "paypal", "estandar")
+    mostrar_resultado(8000, 2.50, "medio", "tela_plana", "paypal", "premium")

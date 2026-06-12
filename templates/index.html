@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Bordados</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:wght@300;600;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:        #0f0e0c;
+            --surface:   #1a1916;
+            --border:    #2e2c28;
+            --gold:      #c9a84c;
+            --gold-dim:  #8a6f2e;
+            --text:      #e8e4dc;
+            --text-dim:  #7a7568;
+            --green:     #4caf7d;
+            --red:       #e05c5c;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .label {
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 2.8rem;
+            font-weight: 900;
+            line-height: 1;
+            color: var(--text);
+        }
+
+        h1 span { color: var(--gold); }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        /* GRID PRINCIPAL */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        /* PANEL */
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+        }
+
+        .panel-title {
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            color: var(--gold-dim);
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* CAMPOS */
+        .field {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+
+        input, select {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.85rem;
+            padding: 0.6rem 0.8rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--gold);
+        }
+
+        select option { background: var(--bg); }
+
+        /* BOTON */
+        button {
+            width: 100%;
+            background: var(--gold);
+            color: var(--bg);
+            border: none;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            padding: 0.9rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        button:hover { background: #e0b85a; }
+        button:active { background: var(--gold-dim); }
+
+        /* RESULTADO */
+        .result-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            display: none;
+        }
+
+        .result-panel.visible { display: block; }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.8rem;
+        }
+
+        .result-row:last-child { border-bottom: none; }
+
+        .result-label { color: var(--text-dim); }
+
+        .result-value { color: var(--text); }
+
+        .result-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gold-dim);
+        }
+
+        .total-label {
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            color: var(--gold);
+            text-transform: uppercase;
+        }
+
+        .total-value {
+            font-family: 'Fraunces', serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--gold);
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 0.2rem 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .badge-captacion { background: #1a2e1a; color: var(--green); }
+        .badge-estandar  { background: #1a1a2e; color: #7a9ef5; }
+        .badge-premium   { background: #2e1a1a; color: var(--red); }
+
+        /* HISTORIAL */
+        .historial-panel {
+            margin-top: 2rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+        }
+
+        .historial-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .historial-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 1rem;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .historial-row:last-child { border-bottom: none; }
+        .historial-row .precio { color: var(--gold); }
+
+        .btn-historial {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            width: auto;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.65rem;
+            margin-top: 0;
+        }
+
+        .btn-historial:hover {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .error-msg {
+            color: var(--red);
+            font-size: 0.8rem;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border: 1px solid var(--red);
+            display: none;
+        }
+
+        .error-msg.visible { display: block; }
+
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: 1fr; }
+            h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <header>
+        <p class="label">Sistema de Cotización Profesional</p>
+        <h1>Bordados<span>.</span></h1>
+        <p class="subtitle">Digitalización textil — JeduardoMunoz</p>
+    </header>
+
+    <div class="grid">
+
+        <!-- FORMULARIO -->
+        <div class="panel">
+            <p class="panel-title">Parámetros del diseño</p>
+
+            <div class="field">
+                <label>Puntadas</label>
+                <input type="number" id="puntadas" placeholder="8000" min="1">
+            </div>
+
+            <div class="field">
+                <label>Tarifa por millar (USD)</label>
+                <input type="number" id="tarifa" placeholder="2.50" step="0.10" min="0.01">
+            </div>
+
+            <div class="field">
+                <label>Complejidad</label>
+                <select id="complejidad">
+                    {% for op in opciones.complejidad %}
+                    <option value="{{ op }}">{{ op }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Tipo de prenda</label>
+                <select id="prenda">
+                    {% for op in opciones.prendas %}
+                    <option value="{{ op }}">{{ op }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Plataforma de pago</label>
+                <select id="plataforma">
+                    {% for op in opciones.plataformas %}
+                    <option value="{{ op }}">{{ op }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Modo de precio</label>
+                <select id="modo">
+                    {% for op in opciones.modos %}
+                    <option value="{{ op }}">{{ op }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button onclick="calcular()">Calcular precio</button>
+
+            <div class="error-msg" id="error"></div>
+        </div>
+
+        <!-- RESULTADO -->
+        <div class="result-panel" id="resultado">
+            <p class="panel-title">Desglose de cotización</p>
+
+            <div class="result-row">
+                <span class="result-label">Precio base</span>
+                <span class="result-value" id="r-base">—</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Cargo complejidad</span>
+                <span class="result-value" id="r-complejidad">—</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Cargo prenda</span>
+                <span class="result-value" id="r-prenda">—</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Subtotal</span>
+                <span class="result-value" id="r-subtotal">—</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Comisión plataforma</span>
+                <span class="result-value" id="r-plataforma">—</span>
+            </div>
+
+            <div class="result-total">
+                <div>
+                    <p class="total-label">Cobrar al cliente</p>
+                    <div id="r-badge"></div>
+                </div>
+                <span class="total-value" id="r-total">—</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- HISTORIAL -->
+    <div class="historial-panel">
+        <div class="historial-header">
+            <p class="panel-title" style="margin:0;border:none;padding:0">Historial de cotizaciones</p>
+            <button class="btn-historial" onclick="cargarHistorial()">Actualizar</button>
+        </div>
+        <div id="historial-contenido">
+            <p style="color:var(--text-dim);font-size:0.75rem">Genera una cotización para ver el historial.</p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+async function calcular() {
+    const datos = {
+        puntadas:    document.getElementById("puntadas").value,
+        tarifa:      document.getElementById("tarifa").value,
+        complejidad: document.getElementById("complejidad").value,
+        prenda:      document.getElementById("prenda").value,
+        plataforma:  document.getElementById("plataforma").value,
+        modo:        document.getElementById("modo").value
+    };
+
+    const res = await fetch("/calcular", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos)
+    });
+
+    const data = await res.json();
+
+    const error = document.getElementById("error");
+    const resultado = document.getElementById("resultado");
+
+    if (data.error) {
+        error.textContent = data.error;
+        error.classList.add("visible");
+        resultado.classList.remove("visible");
+        return;
+    }
+
+    error.classList.remove("visible");
+    resultado.classList.add("visible");
+
+    document.getElementById("r-base").textContent       = "$" + data.precio_base.toFixed(2);
+    document.getElementById("r-complejidad").textContent = "$" + data.cargo_complejidad.toFixed(2);
+    document.getElementById("r-prenda").textContent     = "$" + data.cargo_prenda.toFixed(2);
+    document.getElementById("r-subtotal").textContent   = "$" + data.subtotal.toFixed(2);
+    document.getElementById("r-plataforma").textContent = data.plataforma;
+    document.getElementById("r-total").textContent      = "$" + data.precio_final.toFixed(2);
+
+    const badge = document.getElementById("r-badge");
+    badge.innerHTML = `<span class="badge badge-${data.modo}">${data.modo}</span>`;
+
+    cargarHistorial();
+}
+
+async function cargarHistorial() {
+    const res = await fetch("/historial");
+    const data = await res.json();
+
+    const contenido = document.getElementById("historial-contenido");
+
+    if (data.length === 0) {
+        contenido.innerHTML = '<p style="color:var(--text-dim);font-size:0.75rem">Sin cotizaciones todavía.</p>';
+        return;
+    }
+
+    contenido.innerHTML = data.map(c => `
+        <div class="historial-row">
+            <span>${c.fecha}</span>
+            <span>${c.puntadas.toLocaleString()} pts</span>
+            <span>${c.modo}</span>
+            <span class="precio">$${c.precio.toFixed(2)}</span>
+        </div>
+    `).join("");
+}
+</script>
+</body>
+</html>

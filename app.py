@@ -11,7 +11,6 @@ from calculadora import calcular_precio, COMPLEJIDAD, PRENDAS, PLATAFORMAS, MODO
 # Motivo: la ruta /historial necesita datos, no impresión en consola
 # Se eliminó también "import sqlite3" — ya no hay SQL directo en este archivo
 from base_datos import crear_tabla, guardar_cotizacion, obtener_historial
-import sqlite3
 
 app = Flask(__name__)
 
