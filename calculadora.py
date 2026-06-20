@@ -7,6 +7,11 @@
 
 from base_datos import crear_tabla, guardar_cotizacion
 
+# --- TARIFA BASE ---
+# Esta es TU tarifa. El cliente no la ve ni la modifica.
+# Para ajustar tus precios, cambia solo este número.
+TARIFA_BASE = 2.50  # USD por millar de puntadas
+
 # --- SECCIÓN 1: PLATAFORMAS DE PAGO ---
 PLATAFORMAS = {
     "binance": {"porcentaje": 0.001, "fijo": 0.00},
@@ -42,11 +47,9 @@ MODO_PRECIO = {
 }
 
 # --- SECCIÓN 5: VALIDACIÓN ---
-def validar_inputs(puntadas, tarifa, complejidad, prenda, plataforma,modo):
+def validar_inputs(puntadas, complejidad, prenda, plataforma,modo):
     if puntadas <= 0:
         return "Error: las puntadas deben ser mayor a 0."
-    if tarifa <= 0:
-        return "Error: la tarifa debe ser mayor a 0."
     if complejidad not in COMPLEJIDAD:
         return f"Error: complejidad '{complejidad}' no válida. Usa: simple, medio, complejo."
     if prenda not in PRENDAS:
@@ -59,12 +62,12 @@ def validar_inputs(puntadas, tarifa, complejidad, prenda, plataforma,modo):
 
 
 # --- SECCIÓN 5: CÁLCULO ---
-def calcular_precio(puntadas, tarifa, complejidad, prenda, plataforma, modo):
-    error = validar_inputs(puntadas, tarifa, complejidad, prenda, plataforma, modo)
+def calcular_precio(puntadas, complejidad, prenda, plataforma, modo):
+    error = validar_inputs(puntadas, complejidad, prenda, plataforma, modo)
     if error:
         return error
 
-    precio_base       = (puntadas / 1000) * tarifa
+    precio_base       = (puntadas / 1000) * TARIFA_BASE
     cargo_complejidad = precio_base * COMPLEJIDAD[complejidad]
     cargo_prenda      = PRENDAS[prenda]
     subtotal          = precio_base + cargo_complejidad + cargo_prenda
@@ -80,14 +83,14 @@ def calcular_precio(puntadas, tarifa, complejidad, prenda, plataforma, modo):
 
 
 # --- SECCIÓN 6: MOSTRAR RESULTADO ---
-def mostrar_resultado(puntadas, tarifa, complejidad, prenda, plataforma, modo):
-    precio = calcular_precio(puntadas, tarifa, complejidad, prenda, plataforma, modo)
+def mostrar_resultado(puntadas, complejidad, prenda, plataforma, modo):
+    precio = calcular_precio(puntadas, complejidad, prenda, plataforma, modo)
 
     if isinstance(precio, str):
         print(f"\n{precio}")
         return
 
-    precio_base       = (puntadas / 1000) * tarifa
+    precio_base       = (puntadas / 1000) * TARIFA_BASE
     cargo_complejidad = precio_base * COMPLEJIDAD[complejidad]
     cargo_prenda      = PRENDAS[prenda]
     subtotal          = precio_base + cargo_complejidad + cargo_prenda
@@ -97,7 +100,6 @@ def mostrar_resultado(puntadas, tarifa, complejidad, prenda, plataforma, modo):
     print("   COTIZACIÓN — DIGITALIZACIÓN DE BORDADOS")
     print("=" * 48)
     print(f"  Puntadas:           {puntadas:,}")
-    print(f"  Tarifa por millar:  ${tarifa:.2f}")
     print(f"  Complejidad:        {complejidad}")
     print(f"  Prenda:             {prenda}")
     print(f"  Modo de precio:     {modo}")
@@ -113,7 +115,7 @@ def mostrar_resultado(puntadas, tarifa, complejidad, prenda, plataforma, modo):
     print("=" * 48)
 
 # Guardamos la cotizacion en el historial
-    guardar_cotizacion(puntadas, tarifa, complejidad, prenda, plataforma, modo, precio)
+    guardar_cotizacion(puntadas, TARIFA_BASE, complejidad, prenda, plataforma, modo, precio)
 
 
 # Inicializamos la base de datos
@@ -127,6 +129,6 @@ crear_tabla()
 if __name__ == "__main__":
     crear_tabla()
     print("\n--- COMPARACION DE MODOS ---")
-    mostrar_resultado(8000, 2.50, "medio", "tela_plana", "paypal", "captacion")
-    mostrar_resultado(8000, 2.50, "medio", "tela_plana", "paypal", "estandar")
-    mostrar_resultado(8000, 2.50, "medio", "tela_plana", "paypal", "premium")
+    mostrar_resultado(8000, "medio", "tela_plana", "paypal", "captacion")
+    mostrar_resultado(8000, "medio", "tela_plana", "paypal", "estandar")
+    mostrar_resultado(8000, "medio", "tela_plana", "paypal", "premium")

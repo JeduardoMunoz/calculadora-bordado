@@ -6,7 +6,7 @@
 # ============================================================
 
 from flask import Flask, render_template, request, jsonify
-from calculadora import calcular_precio, COMPLEJIDAD, PRENDAS, PLATAFORMAS, MODO_PRECIO
+from calculadora import TARIFA_BASE, calcular_precio, COMPLEJIDAD, PRENDAS, PLATAFORMAS, MODO_PRECIO
 # REFACTOR v1.1 — agregado obtener_historial, eliminado ver_historial
 # Motivo: la ruta /historial necesita datos, no impresión en consola
 # Se eliminó también "import sqlite3" — ya no hay SQL directo en este archivo
@@ -32,25 +32,28 @@ def index():
 
 @app.route("/calcular", methods=["POST"])
 def calcular():
-    # Recibimos los datos del formulario
     datos = request.get_json()
 
+    # Validación básica antes de procesar
+    if not datos.get("puntadas") or datos["puntadas"] == "":
+        return jsonify({"error": "Error: ingresa un número de puntadas válido."})
+
     puntadas    = int(datos["puntadas"])
-    tarifa      = float(datos["tarifa"])
+    tarifa      = TARIFA_BASE
     complejidad = datos["complejidad"]
     prenda      = datos["prenda"]
     plataforma  = datos["plataforma"]
     modo        = datos["modo"]
 
     # Calculamos el precio
-    precio = calcular_precio(puntadas, tarifa, complejidad, prenda, plataforma, modo)
+    precio = calcular_precio(puntadas, complejidad, prenda, plataforma, modo)
 
     # Si hay error de validacion lo devolvemos
     if isinstance(precio, str):
         return jsonify({"error": precio})
 
     # Calculamos el desglose para mostrar
-    precio_base       = (puntadas / 1000) * tarifa
+    precio_base       = (puntadas / 1000) * TARIFA_BASE 
     cargo_complejidad = precio_base * COMPLEJIDAD[complejidad]
     cargo_prenda      = PRENDAS[prenda]
     subtotal          = precio_base + cargo_complejidad + cargo_prenda
